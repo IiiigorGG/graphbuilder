@@ -19,10 +19,12 @@ class Playground extends React.Component {
   drawVertice = (e) => {
     console.log(this.state.graph);
     let pos = e.target.getStage().getPointerPosition()
-    let newVertice = new Vertice(this.state.graph.vertices.length, pos)
 
-    this.state.graph.addVertice(newVertice)
-    this.forceUpdate()
+    if(this.state.graph.canDrawVertice(pos)){
+      let newVertice = new Vertice(this.state.graph.vertices.length, pos)
+      this.state.graph.addVertice(newVertice)
+      this.forceUpdate()
+    }
   }
 
   render(){
