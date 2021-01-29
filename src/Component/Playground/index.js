@@ -16,6 +16,7 @@ class Playground extends React.Component {
 
     let key = e.target.attrs.id;
     if(this.state.chosen !== null && this.state.chosen != key){
+      console.log(this.state.chosen, key);
       this.state.graph.linkVertices(this.state.chosen, key)
       this.state.chosen = null
       this.forceUpdate()
@@ -62,12 +63,16 @@ class Playground extends React.Component {
             </Label>
           ))}
           {this.state.graph.vertices.map((vertice) => {
+            let lines = []
+
             for(let adjasent of vertice.adjasents){
-                return(<Line
-                  points={[vertice.coordinates.x, vertice.coordinates.y, adjasent.coordinates.x, adjasent.coordinates.y]}
-                  stroke='5px'
-                  />)
+              lines.push(<Line
+                points={[vertice.coordinates.x, vertice.coordinates.y, adjasent.coordinates.x, adjasent.coordinates.y]}
+                stroke='5px'
+                />)
             }
+
+            return(lines)
           })}
         </Layer>
       </Stage>

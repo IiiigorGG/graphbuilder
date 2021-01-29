@@ -14,6 +14,7 @@ class Vertice{
         return
     }
 
+    console.log('here');
     this.adjasents.push(vertice);
   }
 }
