@@ -5,16 +5,25 @@ import Vertice from '../../Entity/Vertice'
 import { Stage, Layer, Label, Rect, Text, Circle, Line } from 'react-konva';
 
 class Playground extends React.Component {
+  state = {graph: new Graph(), matrix: Array(100).fill(Array(100).fill(null)), chosen: null};
+
   constructor(props){
     super(props);
-
-    this.state = {graph: new Graph()};
   }
 
   verticeChosen = (e) => {
-    let key = e.target.attrs.id;
+    e.cancelBubble = true;
 
-    console.log(key);
+    let key = e.target.attrs.id;
+    if(this.state.chosen !== null && this.state.chosen != key){
+      this.state.graph.linkVertices(this.state.chosen, key)
+      this.state.chosen = null
+      this.forceUpdate()
+
+      return
+    }
+
+    this.state.chosen = key;
   }
 
   drawVertice = (e) => {
@@ -25,6 +34,8 @@ class Playground extends React.Component {
       this.state.graph.addVertice(newVertice)
       this.forceUpdate()
     }
+
+    this.state.chosen = null
   }
 
   render(){
@@ -38,8 +49,8 @@ class Playground extends React.Component {
                 id={vertice.key}
                 x={vertice.coordinates.x}
                 y={vertice.coordinates.y}
-                width={50}
-                height={50}
+                width={70}
+                height={70}
                 fill="#89b717"
                 onClick={this.verticeChosen}
               />
@@ -50,6 +61,14 @@ class Playground extends React.Component {
               />
             </Label>
           ))}
+          {this.state.graph.vertices.map((vertice) => {
+            for(let adjasent of vertice.adjasents){
+                return(<Line
+                  points={[vertice.coordinates.x, vertice.coordinates.y, adjasent.coordinates.x, adjasent.coordinates.y]}
+                  stroke='5px'
+                  />)
+            }
+          })}
         </Layer>
       </Stage>
     )

@@ -9,6 +9,11 @@ class Vertice{
   }
 
   addAdjacent(vertice){
+    for(let adjasent of this.adjasents){
+      if(adjasent.key == vertice.key)
+        return
+    }
+
     this.adjasents.push(vertice);
   }
 }

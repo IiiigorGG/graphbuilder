@@ -2,12 +2,19 @@
 class Graph {
   constructor(){
     this.vertices = [];
-    this.minLength = 50
+    this.minLength = 70
     return this;
   }
 
   addVertice(vertice){
-    this.vertices.push(vertice);
+    this.vertices[vertice.key] = vertice;
+  }
+
+  linkVertices(key1, key2){
+    let vertice1 = this.vertices[key1]
+    let vertice2 = this.vertices[key2]
+
+    vertice1.addAdjacent(vertice2)
   }
 
   canDrawVertice(pos){
@@ -21,11 +28,7 @@ class Graph {
   }
 
   length(pos1, pos2){
-    let l = Math.sqrt((pos1.x - pos2.x)*(pos1.x - pos2.x) + (pos1.y - pos2.y)*(pos1.y - pos2.y))
-
-    console.log(l);
-
-    return l;
+    return Math.sqrt((pos1.x - pos2.x)*(pos1.x - pos2.x) + (pos1.y - pos2.y)*(pos1.y - pos2.y))
   }
 }
 
