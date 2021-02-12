@@ -3,19 +3,29 @@ class Vertice{
   constructor(key, coordinates){
     this.key = key;
     this.coordinates = coordinates;
-    this.adjasents = [];
+    this.adjacents = [];
 
     return this;
   }
 
   addAdjacent(vertice){
-    for(let adjasent of this.adjasents){
-      if(adjasent.key == vertice.key)
+    for(let adjacent of this.adjacents){
+      if(adjacent.key == vertice.key)
         return
     }
 
-    console.log('here');
-    this.adjasents.push(vertice);
+    this.adjacents.push(vertice);
+  }
+
+  removeLinkIfExist(vertice) {
+    var i = 0;
+    while (i < this.adjacents.length) {
+      if (this.adjacents[i].key === vertice.key) {
+        this.adjacents.splice(i, 1);
+      } else {
+        ++i;
+      }
+    }
   }
 }
 

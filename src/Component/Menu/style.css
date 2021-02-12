@@ -1,0 +1,43 @@
+.menu {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  display: block;
+  width: 200px;
+  height: 400px;
+  border-radius: 10px;
+  box-shadow: 0px 3px 10px 0.01px grey;
+}
+
+.menu-item {
+  display: block;
+  width: 90%;
+}
+
+.upload_menu {
+   height: 50px;
+}
+
+.title {
+  height: 40px;
+  margin: 5%;
+  font-size: 30px;
+  text-align: center;
+}
+
+.radiobutton {
+  height: 40px;
+  margin: 5%;
+  font-size: 20px;
+  text-align: center;
+}
+
+.radio-button {
+  height: 15px;
+  width: 15px;
+  margin-right: 20px;
+}
+
+.save-button {
+  width: 100px;
+}
