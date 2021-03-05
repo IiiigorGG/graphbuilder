@@ -4,6 +4,7 @@ class Vertice{
     this.key = key;
     this.coordinates = coordinates;
     this.adjacents = [];
+    this.status = 'wait'
 
     return this;
   }
@@ -26,6 +27,10 @@ class Vertice{
         ++i;
       }
     }
+  }
+
+  getAdjacents(){
+    return this.adjacents
   }
 }
 

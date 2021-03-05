@@ -45,6 +45,7 @@ class Playground extends React.Component {
 
     if(this.state.managmentData.verticesManagment == "creation"){
       this.manageEdje(e);
+      this.forceUpdate()
     }
     else{
       this.removeVertice(e);
@@ -84,16 +85,28 @@ class Playground extends React.Component {
     if(this.state.graph.canDrawVertice(pos) && this.state.managmentData.verticesManagment == "creation"){
       let newVertice = new Vertice(this.state.graph.vertices.length, pos)
       this.state.graph.addVertice(newVertice)
-      this.forceUpdate()
     }
 
     this.state.chosen = null
+    this.forceUpdate()
   }
 
   render(){
     return (
       <Stage width={window.innerWidth} height={window.innerHeight} onClick={this.drawVertice} value='2'>
         <Layer>
+        {this.state.graph.vertices.map((vertice) => {
+          let lines = []
+
+          for(let adjacent of vertice.adjacents){
+            lines.push(<Line
+              points={[vertice.coordinates.x, vertice.coordinates.y, adjacent.coordinates.x, adjacent.coordinates.y]}
+              stroke="black"
+              />)
+          }
+
+          return(lines)
+        })}
           {this.state.graph.vertices.map((vertice) => (
             <Label>
               <Circle
@@ -103,7 +116,7 @@ class Playground extends React.Component {
                 y={vertice.coordinates.y}
                 width={70}
                 height={70}
-                fill="#89b717"
+                fill={vertice.key == this.state.chosen ? "red" : "green"}
                 onClick={this.verticeChosen}
               />
               <Text
@@ -113,18 +126,6 @@ class Playground extends React.Component {
               />
             </Label>
           ))}
-          {this.state.graph.vertices.map((vertice) => {
-            let lines = []
-
-            for(let adjacent of vertice.adjacents){
-              lines.push(<Line
-                points={[vertice.coordinates.x, vertice.coordinates.y, adjacent.coordinates.x, adjacent.coordinates.y]}
-                stroke='5px'
-                />)
-            }
-
-            return(lines)
-          })}
         </Layer>
       </Stage>
     )
