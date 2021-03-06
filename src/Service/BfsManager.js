@@ -1,26 +1,47 @@
+import VerticeStatus from '../Enum/VerticeStatus';
 
 class BfsManager{
-  query = [];
-  visited = [];
-
   constructor(graph, startVertice){
     this.graph = graph;
-    this.query.push_back(startVertice);
+    this.queue = []
+    this.visited = []
+    this.round = 0
 
-    return this;
+    startVertice.status = VerticeStatus.IN_WORK
+
+    this.queue.push({
+      vertice: startVertice,
+      round: this.round
+    })
   }
 
   doStep(){
-    let activeVertice = this.query.pop()
+    while(this.queue.length > 0){
+      let activeVertice = this.queue.pop()
 
-    for(let adjacentVertice of activeVertice){
-      if(!this.isVisited(adjacent.key)){
-          adjacentVertice.status = 'inWork'
-          
+      if(activeVertice.round > this.round){
+        this.queue.push(activeVertice)
+        break
       }
+
+      activeVertice = activeVertice.vertice
+
+      for(let adjacentVertice of activeVertice.getAdjacents()){
+        if(!this.isVisited(adjacentVertice.key)){
+            adjacentVertice.status = VerticeStatus.IN_WORK
+            this.queue.push({vertice: adjacentVertice, round: this.round + 1})
+        }
+      }
+
+      this.setVisited(activeVertice.key)
+      activeVertice.status = VerticeStatus.PROCESSED
+
+      this.queue.sort(function(a, b) {
+        return b.round - a.round;
+      });
     }
 
-    activeVertice.status = 'processed'
+    this.round++
   }
 
   isVisited(key){
@@ -28,6 +49,10 @@ class BfsManager{
       return true
 
     return false
+  }
+
+  setVisited(key){
+    this.visited[key] = true
   }
 
 }

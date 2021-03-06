@@ -4,7 +4,7 @@ class Vertice{
     this.key = key;
     this.coordinates = coordinates;
     this.adjacents = [];
-    this.status = 'wait'
+    this.status = 'inWait'
 
     return this;
   }

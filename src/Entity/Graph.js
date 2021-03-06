@@ -26,6 +26,7 @@ class Graph {
     let vertice2 = this.getVertice(key2)
 
     vertice1.addAdjacent(vertice2)
+    vertice2.addAdjacent(vertice1)
   }
 
   removeEdje(key1, key2){
@@ -78,7 +79,7 @@ class Graph {
       })
 
       for(let adjacent of vertice.adjacents){
-        result[vertice.key].adjacents.push(adjacent.key)
+        result[vertice.key-1].adjacents.push(adjacent.key)
       }
     }
 
