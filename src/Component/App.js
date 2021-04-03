@@ -2,11 +2,12 @@ import './App.css';
 import React from 'react';
 import Playground from './Playground/playground'
 import Algorithm from './Algorithm/algorithm'
+import GraphDisplay from './GraphDisplay/graphDisplay'
 import Menu from './Menu/menu'
 
 class App extends React.Component{
   state = {
-    bfsStarted: false,
+    topStarted: false,
     queue: [],
     managmentData: {
       verticesManagment: "creation",
@@ -28,26 +29,17 @@ class App extends React.Component{
     this.refs.child.saveGraphToFile(pathToSaveTo);
   }
 
-  startBfs = () => {
-    this.refs.child.startBfs();
+  startTop = async () => {
+    await this.refs.child.startTop();
   }
 
-  stopBfs = () => {
-    this.setBfsStarted(false)
-    this.refs.child.stopBfs()
-  }
-
-  doStep = () => {
-    this.refs.child.doStep()
-  }
-
-  setBfsStarted = (bfsStarted) => {
+  setTopStarted = (topStarted) => {
     this.setState({
-      bfsStarted: bfsStarted
+      topStarted: topStarted
     })
   }
 
-  setQueue = (queue) => {
+  updateDisplayedQueue = (queue) => {
     this.setState({
       queue: queue
     })
@@ -56,9 +48,10 @@ class App extends React.Component{
   render(){
     return (
       <div className="App">
-        <Playground ref="child" managmentData={this.state.managmentData} bfsStarted={this.state.bfsStarted} setBfsStarted={this.setBfsStarted} setQueue={this.setQueue}/>
+        <Playground ref="child" managmentData={this.state.managmentData} setTopStarted={this.setTopStarted} updateDisplayedQueue={this.updateDisplayedQueue}/>
         <Menu updateManagmentData={this.updateManagmentData} loadGraphFromFile={this.loadGraphFromFile} saveGraphToFile={this.saveGraphToFile}/>
-        <Algorithm startBfs={this.startBfs} stopBfs={this.stopBfs} doStep={this.doStep} setBfsStarted={this.setBfsStarted} bfsStarted={this.state.bfsStarted} queue={this.state.queue}/>
+        <Algorithm startTop={async () => {await this.startTop()} } topStarted={this.state.topStarted}/>
+        <GraphDisplay queue={this.state.queue}/>
       </div>
     );
   }

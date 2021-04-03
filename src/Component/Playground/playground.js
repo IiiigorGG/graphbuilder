@@ -2,7 +2,7 @@ import './style.css';
 import React from 'react';
 import Graph from '../../Entity/Graph'
 import Vertice from '../../Entity/Vertice'
-import BfsManager from '../../Service/BfsManager'
+import TopManager from '../../Service/TopManager'
 import VerticeStatus from '../../Enum/VerticeStatus'
 import { Stage, Layer, Label, Rect, Text, Circle, Line } from 'react-konva';
 
@@ -13,22 +13,22 @@ class Playground extends React.Component {
     graph: new Graph(),
     matrix: Array(100).fill(Array(100).fill(null)),
     chosen: null,
-    bfsStarted: false,
+    graphAvailable: true,
     managmentData: {
       verticesManagment: "creation",
       edjesManagment: "creation"
-    }
+    },
+    timestamps: []
   };
 
   constructor(props){
     super(props);
 
-    this.state.setBfsStarted = this.props.setBfsStarted
-    this.state.setQueue = this.props.setQueue
+    this.state.setTopStarted = this.props.setTopStarted
+    this.state.updateDisplayedQueue = this.props.updateDisplayedQueue
   }
 
   componentWillReceiveProps(nextProps) {
-    this.state.bfsStarted = nextProps.bfsStarted
     this.state.managmentData = {
       verticesManagment: nextProps.managmentData.verticesManagment,
       edjesManagment: nextProps.managmentData.edjesManagment
@@ -36,14 +36,20 @@ class Playground extends React.Component {
   }
 
   saveGraphToFile = (pathToSaveTo) => {
-    this.stopBfs()
+    if(!this.state.graphAvailable){
+      return
+    }
+
     let data = "data:text/plain;base64," + encodeBase64(JSON.stringify(this.state.graph.toString()))
 
     saveAs(data, "graphData.txt");
   }
 
   loadGraphFromFile = (graphData) => {
-    this.stopBfs()
+    if(!this.state.graphAvailable){
+      return
+    }
+
     this.state.graph.loadFromJson(graphData)
 
     this.forceUpdate()
@@ -100,39 +106,47 @@ class Playground extends React.Component {
     this.forceUpdate()
   }
 
-  startBfs = (e) => {
-    if(this.state.chosen === null){
-      alert('Choose Start Vertice')
-      return
-    }
-
-    this.state.bfsManager = new BfsManager(this.state.graph, this.state.graph.getVertice(this.state.chosen))
-
-    this.state.setQueue(this.state.bfsManager.queue)
-    this.state.setBfsStarted(true)
-    this.state.chosen = null
+  updateUI = () => {
     this.forceUpdate()
   }
 
-  stopBfs = (e) => {
-    for(let vertice of this.state.graph.vertices){
-      vertice.status = VerticeStatus.IN_WAIT
-    }
+  startTop = async (e) => {
+    this.state.timestamps = []
+    this.state.updateDisplayedQueue([])
+    this.state.graph.vertices.map((el) => {
+      el.status = VerticeStatus.IN_WAIT
+    })
 
-    this.state.setQueue([])
-    this.state.setBfsStarted(false)
+    this.state.topManager = new TopManager(this.state.graph, this.state.timestamps)
+    this.state.graphAvailable = false
+    this.state.setTopStarted(true)
     this.forceUpdate()
+
+    await this.state.topManager.sort(this.updateUI)
+    this.state.setTopStarted(false)
+    let queue = this.state.graph.vertices.map((el) => {
+      return {
+        key: el.key,
+        enter: this.state.timestamps[el.key].enter,
+        exit: this.state.timestamps[el.key].exit
+      }
+    })
+
+    queue.sort((a,b)=>{
+      console.log(b.exit.getTime());
+      return a.exit.getTime() - b.exit.getTime()
+    })
+
+    this.state.updateDisplayedQueue(queue)
   }
 
-  doStep = (e) => {
-    if(this.state.bfsManager.queue.length > 0){
-      this.state.bfsManager.doStep()
-      this.state.setQueue(this.state.bfsManager.queue)
-      this.forceUpdate()
-    }
-    else{
-      this.stopBfs()
-    }
+  getCurrentTime = (dateTime) => {
+
+    let hours = dateTime.getHours()
+    let minutes = dateTime.getMinutes()
+    let seconds = dateTime.getSeconds();
+
+    return hours + ":" + minutes + ":" + seconds
   }
 
   render(){
@@ -154,7 +168,7 @@ class Playground extends React.Component {
           {this.state.graph.vertices.map((vertice) => {
             let color = 'green'
 
-            if(this.state.bfsStarted){
+            if(!this.state.graphAvailable){
               switch (vertice.status) {
                 case VerticeStatus.PROCESSED:
                   color = 'blue'
@@ -168,6 +182,16 @@ class Playground extends React.Component {
             }
             else{
               color = this.state.chosen === vertice.key ? 'red' : 'green'
+            }
+
+            let enterTimestamp = ''
+            let exitTimestamp = ''
+
+            if(this.state.timestamps[vertice.key] !== undefined){
+              if(this.state.timestamps[vertice.key].enter !== undefined)
+                enterTimestamp = 'enter: ' + this.getCurrentTime(this.state.timestamps[vertice.key].enter)
+              if(this.state.timestamps[vertice.key].exit !== undefined)
+                exitTimestamp = 'exit: ' + this.getCurrentTime(this.state.timestamps[vertice.key].exit)
             }
 
             return (
@@ -186,6 +210,16 @@ class Playground extends React.Component {
                   text={vertice.key}
                   x={vertice.coordinates.x-3}
                   y={vertice.coordinates.y-5}
+                />
+                <Text
+                  text={enterTimestamp}
+                  x={vertice.coordinates.x+10}
+                  y={vertice.coordinates.y-20}
+                />
+                <Text
+                  text={exitTimestamp}
+                  x={vertice.coordinates.x+10}
+                  y={vertice.coordinates.y-30}
                 />
               </Label>
             )

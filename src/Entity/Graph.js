@@ -25,7 +25,6 @@ class Graph {
     let vertice1 = this.getVertice(key1)
     let vertice2 = this.getVertice(key2)
 
-    vertice1.addAdjacent(vertice2)
     vertice2.addAdjacent(vertice1)
   }
 
