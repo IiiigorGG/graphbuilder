@@ -1,9 +1,8 @@
 import VerticeStatus from '../Enum/VerticeStatus';
 
 class DfsManager{
-  constructor(graph, timestamps){
+  constructor(graph){
     this.graph = graph
-    this.timestamps = timestamps
     this.visited = []
   }
 
@@ -12,7 +11,6 @@ class DfsManager{
     vertice.status = VerticeStatus.IN_WORK
     updateUI()
     await this.sleep(1000)
-    this.timestamps[vertice.key] = {enter: new Date()}
 
     for(let adjacentVertice of vertice.getAdjacents()){
       if(!this.isVisited(adjacentVertice.key)){
@@ -21,7 +19,6 @@ class DfsManager{
     }
 
     vertice.status = VerticeStatus.PROCESSED
-    this.timestamps[vertice.key].exit = new Date()
     updateUI()
     await this.sleep(1000)
   }

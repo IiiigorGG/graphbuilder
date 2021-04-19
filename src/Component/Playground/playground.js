@@ -2,7 +2,7 @@ import './style.css';
 import React from 'react';
 import Graph from '../../Entity/Graph'
 import Vertice from '../../Entity/Vertice'
-import TopManager from '../../Service/TopManager'
+import EylerManager from '../../Service/EylerManager'
 import VerticeStatus from '../../Enum/VerticeStatus'
 import { Stage, Layer, Label, Rect, Text, Circle, Line } from 'react-konva';
 
@@ -117,27 +117,32 @@ class Playground extends React.Component {
       el.status = VerticeStatus.IN_WAIT
     })
 
-    this.state.topManager = new TopManager(this.state.graph, this.state.timestamps)
-    this.state.graphAvailable = false
-    this.state.setTopStarted(true)
-    this.forceUpdate()
+    this.state.eylerManager = new EylerManager(this.state.graph)
 
-    await this.state.topManager.sort(this.updateUI)
-    this.state.setTopStarted(false)
-    let queue = this.state.graph.vertices.map((el) => {
-      return {
-        key: el.key,
-        enter: this.state.timestamps[el.key].enter,
-        exit: this.state.timestamps[el.key].exit
-      }
-    })
+    if(!this.state.eylerManager.waysExist()){
+      alert("No ways exist")
+      return
+    }
+    // this.state.graphAvailable = false
+    // this.state.setTopStarted(true)
+    // this.forceUpdate()
 
-    queue.sort((a,b)=>{
-      console.log(b.exit.getTime());
-      return a.exit.getTime() - b.exit.getTime()
-    })
-
-    this.state.updateDisplayedQueue(queue)
+    // await this.state.topManager.sort(this.updateUI)
+    // this.state.setTopStarted(false)
+    // let queue = this.state.graph.vertices.map((el) => {
+    //   return {
+    //     key: el.key,
+    //     enter: this.state.timestamps[el.key].enter,
+    //     exit: this.state.timestamps[el.key].exit
+    //   }
+    // })
+    //
+    // queue.sort((a,b)=>{
+    //   console.log(b.exit.getTime());
+    //   return a.exit.getTime() - b.exit.getTime()
+    // })
+    //
+    // this.state.updateDisplayedQueue(queue)
   }
 
   getCurrentTime = (dateTime) => {
