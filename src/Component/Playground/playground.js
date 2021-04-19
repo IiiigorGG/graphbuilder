@@ -4,7 +4,7 @@ import Graph from '../../Entity/Graph'
 import Vertice from '../../Entity/Vertice'
 import TopManager from '../../Service/TopManager'
 import VerticeStatus from '../../Enum/VerticeStatus'
-import { Stage, Layer, Label, Rect, Text, Circle, Line } from 'react-konva';
+import { Arrow, Stage, Layer, Label, Rect, Text, Circle, Line } from 'react-konva';
 
 import { saveAs, encodeBase64 } from '@progress/kendo-file-saver';
 
@@ -72,10 +72,10 @@ class Playground extends React.Component {
 
     if(this.state.chosen !== null && this.state.chosen != key){
       if(this.state.managmentData.edjesManagment === "creation"){
-        this.state.graph.linkVertices(this.state.chosen, key)
+        this.state.graph.linkVertices(key, this.state.chosen)
       }
       else{
-        this.state.graph.removeEdje(this.state.chosen, key)
+        this.state.graph.removeEdje(key, this.state.chosen)
       }
 
       this.state.chosen = null
@@ -133,38 +133,33 @@ class Playground extends React.Component {
     })
 
     queue.sort((a,b)=>{
-      console.log(b.exit.getTime());
-      return a.exit.getTime() - b.exit.getTime()
+      return b.exit - a.exit
     })
 
     this.state.updateDisplayedQueue(queue)
-  }
-
-  getCurrentTime = (dateTime) => {
-
-    let hours = dateTime.getHours()
-    let minutes = dateTime.getMinutes()
-    let seconds = dateTime.getSeconds();
-
-    return hours + ":" + minutes + ":" + seconds
   }
 
   render(){
     return (
       <Stage width={window.innerWidth} height={window.innerHeight} onClick={this.drawVertice} value='2'>
         <Layer>
-        {this.state.graph.vertices.map((vertice) => {
-          let lines = []
+          {this.state.graph.vertices.map((vertice) => {
+            let lines = []
 
-          for(let adjacent of vertice.adjacents){
-            lines.push(<Line
-              points={[vertice.coordinates.x, vertice.coordinates.y, adjacent.coordinates.x, adjacent.coordinates.y]}
-              stroke="black"
-              />)
-          }
+            for(let adjacent of vertice.adjacents){
+              lines.push(<Arrow
+                points={[
+                  vertice.coordinates.x,
+                  vertice.coordinates.y,
+                  adjacent.coordinates.x,
+                  adjacent.coordinates.y
+                ]}
+                stroke="black"
+                />)
+            }
 
-          return(lines)
-        })}
+            return(lines)
+          })}
           {this.state.graph.vertices.map((vertice) => {
             let color = 'green'
 
@@ -189,9 +184,9 @@ class Playground extends React.Component {
 
             if(this.state.timestamps[vertice.key] !== undefined){
               if(this.state.timestamps[vertice.key].enter !== undefined)
-                enterTimestamp = 'enter: ' + this.getCurrentTime(this.state.timestamps[vertice.key].enter)
+                enterTimestamp = 'enter: ' + this.state.timestamps[vertice.key].enter
               if(this.state.timestamps[vertice.key].exit !== undefined)
-                exitTimestamp = 'exit: ' + this.getCurrentTime(this.state.timestamps[vertice.key].exit)
+                exitTimestamp = 'exit: ' + this.state.timestamps[vertice.key].exit
             }
 
             return (
