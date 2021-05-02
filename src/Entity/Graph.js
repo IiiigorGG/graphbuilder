@@ -1,4 +1,5 @@
 import Vertice from './Vertice.js';
+import EdjeStatus from '../Enum/EdjeStatus.js';
 
 class Graph {
   constructor(){
@@ -25,7 +26,8 @@ class Graph {
     let vertice1 = this.getVertice(key1)
     let vertice2 = this.getVertice(key2)
 
-    vertice2.addAdjacent(vertice1)
+    vertice2.addAdjacent({vertice: vertice1, status: EdjeStatus.IN_WAIT})
+    vertice1.addAdjacent({vertice: vertice2, status: EdjeStatus.IN_WAIT})
   }
 
   removeEdje(key1, key2){

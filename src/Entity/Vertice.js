@@ -1,4 +1,4 @@
-
+import EdjeStatus from '../Enum/EdjeStatus'
 class Vertice{
   constructor(key, coordinates){
     this.key = key;
@@ -9,23 +9,33 @@ class Vertice{
     return this;
   }
 
-  addAdjacent(vertice){
+  addAdjacent(newAdjacent){
     for(let adjacent of this.adjacents){
-      if(adjacent.key == vertice.key)
+      if(adjacent.vertice.key == newAdjacent.vertice.key)
         return
     }
 
-    this.adjacents.push(vertice);
+    this.adjacents.push(newAdjacent);
   }
 
   removeLinkIfExist(vertice) {
     var i = 0;
     while (i < this.adjacents.length) {
-      if (this.adjacents[i].key === vertice.key) {
+      if (this.adjacents[i].vertice.key === vertice.key) {
         this.adjacents.splice(i, 1);
       } else {
         ++i;
       }
+    }
+  }
+
+  setEdgeDeleted(vertice) {
+    var i = 0;
+    while (i < this.adjacents.length) {
+      if (this.adjacents[i].vertice.key === vertice.key) {
+        this.adjacents[i].status = EdjeStatus.DELETED
+      }
+      i++
     }
   }
 

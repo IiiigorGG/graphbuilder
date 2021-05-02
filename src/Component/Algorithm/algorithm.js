@@ -26,7 +26,7 @@ class Algorithm extends React.Component {
       <div class="algorithm">
         <div class="algorithm-item title">Algorithms</div>
         <div class="algorithm-item">
-          <button onClick={this.startTop} disabled={this.state.topStarted}>Start Top. Ordering</button>
+          <button onClick={this.startTop} disabled={this.state.topStarted}>Find Eyler's Way</button>
         </div>
       </div>
     )

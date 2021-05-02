@@ -4,6 +4,7 @@ import Graph from '../../Entity/Graph'
 import Vertice from '../../Entity/Vertice'
 import EylerManager from '../../Service/EylerManager'
 import VerticeStatus from '../../Enum/VerticeStatus'
+import EdjeStatus from '../../Enum/EdjeStatus'
 import { Stage, Layer, Label, Rect, Text, Circle, Line } from 'react-konva';
 
 import { saveAs, encodeBase64 } from '@progress/kendo-file-saver';
@@ -111,38 +112,30 @@ class Playground extends React.Component {
   }
 
   startTop = async (e) => {
-    this.state.timestamps = []
+    this.state.graphAvailable = false
     this.state.updateDisplayedQueue([])
     this.state.graph.vertices.map((el) => {
       el.status = VerticeStatus.IN_WAIT
+      el.getAdjacents().map(el2 =>{
+        el2.status = EdjeStatus.IN_WAIT
+      })
     })
 
     this.state.eylerManager = new EylerManager(this.state.graph)
 
-    if(!this.state.eylerManager.waysExist()){
+    if(this.state.eylerManager.oddCount() !== 0 && this.state.eylerManager.oddCount() !== 2 ){
       alert("No ways exist")
       return
     }
-    // this.state.graphAvailable = false
-    // this.state.setTopStarted(true)
-    // this.forceUpdate()
 
-    // await this.state.topManager.sort(this.updateUI)
-    // this.state.setTopStarted(false)
-    // let queue = this.state.graph.vertices.map((el) => {
-    //   return {
-    //     key: el.key,
-    //     enter: this.state.timestamps[el.key].enter,
-    //     exit: this.state.timestamps[el.key].exit
-    //   }
-    // })
-    //
-    // queue.sort((a,b)=>{
-    //   console.log(b.exit.getTime());
-    //   return a.exit.getTime() - b.exit.getTime()
-    // })
-    //
-    // this.state.updateDisplayedQueue(queue)
+    let startVertice = this.state.graph.vertices[0]
+
+    if(this.state.eylerManager.oddCount() == 2){
+      startVertice = this.state.eylerManager.findOddVertice()
+    }
+
+    const queue = await this.state.eylerManager.findWay(startVertice, this.updateUI)
+    this.state.updateDisplayedQueue(queue)
   }
 
   getCurrentTime = (dateTime) => {
@@ -162,9 +155,26 @@ class Playground extends React.Component {
           let lines = []
 
           for(let adjacent of vertice.adjacents){
+            let secondVertice = adjacent.vertice
+            let color = 'green'
+
+            switch (adjacent.status) {
+              case EdjeStatus.IN_WAY:
+                color = 'blue'
+                break
+              case EdjeStatus.IN_WAIT:
+                color = 'green'
+                break
+              case EdjeStatus.DELETED:
+                color = 'red'
+                break
+              default:
+                color = 'green'
+            }
+
             lines.push(<Line
-              points={[vertice.coordinates.x, vertice.coordinates.y, adjacent.coordinates.x, adjacent.coordinates.y]}
-              stroke="black"
+              points={[vertice.coordinates.x, vertice.coordinates.y, secondVertice.coordinates.x, secondVertice.coordinates.y]}
+              stroke={color}
               />)
           }
 
